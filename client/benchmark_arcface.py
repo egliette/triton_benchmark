@@ -29,7 +29,9 @@ def create_test_data(batch_size=1):
 # ===============================
 # Generic Benchmark Function
 # ===============================
-def benchmark(client, infer_input_cls, infer_output_cls, batch_size, num_iterations, num_warmup):
+def benchmark(
+    client, infer_input_cls, infer_output_cls, batch_size, num_iterations, num_warmup
+):
     img_batch = create_test_data(batch_size)
 
     inputs = [infer_input_cls("input.1", img_batch.shape, "FP32")]
@@ -66,7 +68,6 @@ def main():
         print(f"Running benchmarks for batch size: {batch_size}")
         print(f"{'='*60}")
 
-
         # Run HTTP benchmark
         print(f"  Running HTTP benchmark...")
         http_lat = benchmark(
@@ -91,8 +92,12 @@ def main():
 
         # Print results
         print(f"\n  Batch Size {batch_size} Results:")
-        print(f"    HTTP  - Latency: mean={http_lat.mean():.2f} ms, p95={np.percentile(http_lat, 95):.2f} ms")
-        print(f"    gRPC  - Latency: mean={grpc_lat.mean():.2f} ms, p95={np.percentile(grpc_lat, 95):.2f} ms")
+        print(
+            f"    HTTP  - Latency: mean={http_lat.mean():.2f} ms, p95={np.percentile(http_lat, 95):.2f} ms"
+        )
+        print(
+            f"    gRPC  - Latency: mean={grpc_lat.mean():.2f} ms, p95={np.percentile(grpc_lat, 95):.2f} ms"
+        )
 
     print(f"\n{'='*60}")
     print("Benchmark completed!")
