@@ -1,0 +1,33 @@
+networks:
+  triton:
+    external: true
+
+services:
+  triton:
+    image: nvcr.io/nvidia/tritonserver:25.06-py3
+    container_name: triton_server
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+      - TRITON_MODEL_REPOSITORY=/models
+    volumes:
+      - ./models:/models:ro
+    networks:
+      - triton
+    ports:
+      - "8000:8000"  # HTTP
+      - "8001:8001"  # gRPC
+    command: >
+      tritonserver
+      --model-repository=/models
+    runtime: nvidia
+
+
+  client:
+    build: ./client
+    container_name: triton_client
+    command: python
+    volumes:
+      - ./client:/app    
+    tty: true
+    networks:
+      - triton
