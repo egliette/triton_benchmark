@@ -83,7 +83,7 @@ This project uses two different benchmarking approaches:
 
 ### perf_analyzer Results
 
-Results from Triton's official `perf_analyzer` tool (averaged over 20 iterations):
+Results from Triton's official `perf_analyzer` tool (averaged over 20 iterations per batch size):
 
 ```
 ================================================================================
@@ -91,18 +91,50 @@ PERFORMANCE SUMMARY
 ================================================================================
 
 ARCFACE Model:
+
+  Batch Size: 1
 --------------------------------------------------------------------------------
-Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count     
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count
 --------------------------------------------------------------------------------
-HTTP       136.38                         7.54                 20        
-gRPC       135.46                         7.66                 20        
+HTTP       140.88                         7.26                 20
+gRPC       136.96                         7.52                 20
+
+  Batch Size: 4
+--------------------------------------------------------------------------------
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count
+--------------------------------------------------------------------------------
+HTTP       138.38                         7.43                 20
+gRPC       129.14                         7.93                 20
+
+  Batch Size: 8
+--------------------------------------------------------------------------------
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count
+--------------------------------------------------------------------------------
+HTTP       132.93                         7.76                 20
+gRPC       131.87                         7.79                 20
 
 SCRFD Model:
+
+  Batch Size: 1
 --------------------------------------------------------------------------------
-Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count     
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count
 --------------------------------------------------------------------------------
-HTTP       28.22                          24.92                20        
-gRPC       29.51                          22.67                20        
+HTTP       32.37                          20.02                20
+gRPC       26.84                          24.57                20
+
+  Batch Size: 4
+--------------------------------------------------------------------------------
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count
+--------------------------------------------------------------------------------
+HTTP       34.36                          17.37                20
+gRPC       32.96                          19.36                20
+
+  Batch Size: 8
+--------------------------------------------------------------------------------
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count
+--------------------------------------------------------------------------------
+HTTP       33.19                          16.79                20
+gRPC       31.55                          20.90                20
 
 ================================================================================
 ```
