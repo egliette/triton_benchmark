@@ -4,9 +4,6 @@ import numpy as np
 import tritonclient.grpc as grpcclient
 import tritonclient.http as httpclient
 
-# ===============================
-# Configuration
-# ===============================
 MODEL_NAME = "scrfd"
 HTTP_URL = "triton:8000"
 GRPC_URL = "triton:8001"
@@ -16,20 +13,35 @@ NUM_ITERATIONS = 1000
 NUM_WARMUP = 10
 
 
-# ===============================
-# Test Data
-# ===============================
 def create_test_data(batch_size=1):
+    """Create test image data for scrfd model.
+
+    Args:
+        batch_size: Number of images in the batch. Defaults to 1.
+
+    Returns:
+        numpy.ndarray: Test image batch with shape (batch_size, 3, 640, 640) and dtype float32.
+    """
     img = np.zeros((640, 640, 3), dtype=np.uint8)
     img = img.astype(np.float32)
     img = img.transpose(2, 0, 1)[np.newaxis, ...]
     return np.repeat(img, batch_size, axis=0)
 
 
-# ===============================
-# Generic Benchmark Function
-# ===============================
 def benchmark(client, infer_input_cls, infer_output_cls, batch_size, num_iterations, num_warmup):
+    """Run benchmark for a given client and configuration.
+
+    Args:
+        client: Triton inference server client (HTTP or gRPC).
+        infer_input_cls: Input class for the client (InferInput).
+        infer_output_cls: Output class for the client (InferRequestedOutput).
+        batch_size: Number of images in each inference batch.
+        num_iterations: Number of inference iterations to run.
+        num_warmup: Number of warmup iterations before benchmarking.
+
+    Returns:
+        numpy.ndarray: Array of latency measurements in milliseconds.
+    """
     img_batch = create_test_data(batch_size)
 
     inputs = [infer_input_cls("input.1", img_batch.shape, "FP32")]
@@ -50,9 +62,6 @@ def benchmark(client, infer_input_cls, infer_output_cls, batch_size, num_iterati
     return np.array(latencies)
 
 
-# ===============================
-# Run Benchmarks
-# ===============================
 def main():
     batch_sizes = BATCH_SIZES
     num_iterations = NUM_ITERATIONS

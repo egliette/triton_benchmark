@@ -2,6 +2,21 @@
 
 This project benchmarks Triton Inference Server performance using HTTP and gRPC protocols for face detection (SCRFD) and face recognition (ArcFace) models.
 
+## Benchmarking Methods
+
+This project uses two different benchmarking approaches:
+
+1. **Python with Triton Client**: Custom Python scripts using `tritonclient` library to measure latency and throughput. This method provides detailed control over batch sizes, iterations, and concurrent processes.
+
+2. **Triton perf_analyzer**: Official Triton performance analyzer tool written in C++. This tool provides standardized performance metrics but may yield different results compared to the Python client.
+
+**Important Notes:**
+- Results between the two methods may differ significantly due to implementation differences (Python vs C++).
+- When using `perf_analyzer`, RAM usage accumulates over time, which can cause issues with large request counts. For SCRFD model, I use `REQUEST_COUNT = 100` to avoid memory-related failures.
+- Throughput and latency can vary significantly with different request counts. For example, with ArcFace model:
+  - Request count 50: Throughput ~99 infer/sec
+  - Request count 1000: Throughput >120 infer/sec
+
 ## Environment Profile
 
 ### System Information
@@ -66,6 +81,32 @@ This project benchmarks Triton Inference Server performance using HTTP and gRPC 
 | 8          | HTTP     | 27.91             | 46.09            | **56.93**                         | **75.78**                        |
 | 8          | gRPC     | **24.11**         | **32.85**        | 57.96                             | 77.85                            |
 
+### perf_analyzer Results
+
+Results from Triton's official `perf_analyzer` tool (averaged over 20 iterations):
+
+```
+================================================================================
+PERFORMANCE SUMMARY
+================================================================================
+
+ARCFACE Model:
+--------------------------------------------------------------------------------
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count     
+--------------------------------------------------------------------------------
+HTTP       136.38                         7.54                 20        
+gRPC       135.46                         7.66                 20        
+
+SCRFD Model:
+--------------------------------------------------------------------------------
+Protocol   Avg Throughput (infer/sec)     Avg Latency (ms)     Count     
+--------------------------------------------------------------------------------
+HTTP       28.22                          24.92                20        
+gRPC       29.51                          22.67                20        
+
+================================================================================
+```
+
 ## Running Benchmarks
 
 ### Start Triton Server
@@ -92,6 +133,23 @@ docker-compose run --rm client python benchmark_arcface.py
 ### Run ArcFace Concurrent Benchmark (3 processes)
 ```bash
 docker-compose run --rm client python benchmark_arcface_concurrency.py
+```
+
+### Run perf_analyzer Benchmarks
+
+#### Run ArcFace perf_analyzer
+```bash
+docker-compose run --rm client python arcface_perf_analyzer.py
+```
+
+#### Run SCRFD perf_analyzer
+```bash
+docker-compose run --rm client python scrfd_perf_analyzer.py
+```
+
+#### Summarize perf_analyzer Results
+```bash
+docker-compose run --rm client python summarize_perf_results.py
 ```
 
 ## Todo List

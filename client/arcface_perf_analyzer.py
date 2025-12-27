@@ -13,9 +13,6 @@ import subprocess
 import csv
 from datetime import datetime
 
-# ===============================
-# Configuration
-# ===============================
 MODEL_NAME = "arcface"
 HTTP_URL = "triton:8000"
 GRPC_URL = "triton:8001"
@@ -27,11 +24,17 @@ NUM_ITERATIONS = 20
 CSV_FILE = "arcface_perf_results.csv"
 
 
-# ===============================
-# Run perf_analyzer and parse output
-# ===============================
 def run_perf_analyzer(protocol, url):
-    """Run perf_analyzer and extract throughput and avg latency"""
+    """Run perf_analyzer and extract throughput and avg latency.
+
+    Args:
+        protocol: Protocol to use, either "http" or "grpc".
+        url: URL of the Triton inference server.
+
+    Returns:
+        tuple: A tuple of (throughput, avg_latency_ms) where throughput is in infer/sec
+            and avg_latency_ms is in milliseconds. Returns (None, None) on error.
+    """
     cmd = [
         "perf_analyzer",
         "-m", MODEL_NAME,
@@ -63,11 +66,17 @@ def run_perf_analyzer(protocol, url):
         return None, None
 
 
-# ===============================
-# Save to CSV
-# ===============================
 def save_to_csv(protocol, throughput, avg_latency_ms):
-    """Save results to CSV file"""
+    """Save results to CSV file.
+
+    Args:
+        protocol: Protocol name (e.g., "HTTP" or "gRPC").
+        throughput: Throughput value in infer/sec.
+        avg_latency_ms: Average latency in milliseconds.
+
+    Returns:
+        None.
+    """
     file_exists = False
     try:
         with open(CSV_FILE, "r"):
@@ -83,9 +92,6 @@ def save_to_csv(protocol, throughput, avg_latency_ms):
         writer.writerow([datetime.now().isoformat(), protocol, throughput, avg_latency_ms])
 
 
-# ===============================
-# Main
-# ===============================
 def main():
     print(f"Running perf_analyzer for {MODEL_NAME} ({NUM_ITERATIONS} iterations)...")
 

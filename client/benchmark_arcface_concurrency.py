@@ -5,9 +5,6 @@ import numpy as np
 import tritonclient.grpc as grpcclient
 import tritonclient.http as httpclient
 
-# ===============================
-# Configuration
-# ===============================
 MODEL_NAME = "arcface"
 HTTP_URL = "triton:8000"
 GRPC_URL = "triton:8001"
@@ -18,21 +15,35 @@ NUM_WARMUP = 10
 NUM_PROCESSES = 3
 
 
-# ===============================
-# Test Data
-# ===============================
 def create_test_data(batch_size=1):
+    """Create test image data for arcface model.
+
+    Args:
+        batch_size: Number of images in the batch. Defaults to 1.
+
+    Returns:
+        numpy.ndarray: Test image batch with shape (batch_size, 3, 112, 112) and dtype float32.
+    """
     img = np.zeros((112, 112, 3), dtype=np.uint8)
     img = img.astype(np.float32)
     img = img.transpose(2, 0, 1)[np.newaxis, ...]
     return np.repeat(img, batch_size, axis=0)
 
 
-# ===============================
-# Worker Process Function
-# ===============================
 def worker_process(protocol, batch_size, num_iterations, num_warmup, process_id, result_queue):
-    """Worker process that runs benchmark with its own client"""
+    """Worker process that runs benchmark with its own client.
+
+    Args:
+        protocol: Protocol to use, either "HTTP" or "gRPC".
+        batch_size: Number of images in each inference batch.
+        num_iterations: Number of inference iterations to run.
+        num_warmup: Number of warmup iterations before benchmarking.
+        process_id: Unique identifier for this worker process.
+        result_queue: Multiprocessing queue to send results back to main process.
+
+    Returns:
+        None. Results are sent via result_queue.
+    """
     try:
         # Create client for this process
         if protocol == "HTTP":
@@ -71,11 +82,19 @@ def worker_process(protocol, batch_size, num_iterations, num_warmup, process_id,
         result_queue.put((process_id, f"Error: {str(e)}"))
 
 
-# ===============================
-# Run Concurrent Benchmarks
-# ===============================
 def run_concurrent_benchmark(protocol, batch_size, num_iterations, num_warmup, num_processes):
-    """Run benchmark with multiple processes"""
+    """Run benchmark with multiple processes.
+
+    Args:
+        protocol: Protocol to use, either "HTTP" or "gRPC".
+        batch_size: Number of images in each inference batch.
+        num_iterations: Number of inference iterations per process.
+        num_warmup: Number of warmup iterations per process.
+        num_processes: Number of concurrent processes to run.
+
+    Returns:
+        numpy.ndarray: Array of latency measurements in milliseconds from all processes.
+    """
     result_queue = multiprocessing.Queue()
     processes = []
 
@@ -108,9 +127,6 @@ def run_concurrent_benchmark(protocol, batch_size, num_iterations, num_warmup, n
         return np.array([])
 
 
-# ===============================
-# Main Function
-# ===============================
 def main():
     batch_sizes = BATCH_SIZES
     num_iterations = NUM_ITERATIONS
