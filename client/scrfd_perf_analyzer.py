@@ -1,11 +1,11 @@
 # CLI Commands:
-# HTTP: perf_analyzer -m arcface -u triton:8000 -i http \
-#   --warmup-request-count=10 --request-count=5000 \
-#   --max-threads=4 --shape=input.1:1,112,112,3
+# HTTP: perf_analyzer -m scrfd -u triton:8000 -i http \
+#   --warmup-request-count=100 --request-count=100 \
+#   --max-threads=4 --shape=input.1:3,640,640
 #
-# gRPC: perf_analyzer -m arcface -u triton:8001 -i grpc \
-#   --warmup-request-count=10 --request-count=5000 \
-#   --max-threads=4 --shape=input.1:1,112,112,3
+# gRPC: perf_analyzer -m scrfd -u triton:8001 -i grpc \
+#   --warmup-request-count=100 --request-count=100 \
+#   --max-threads=4 --shape=input.1:3,640,640
 
 
 import re
@@ -16,15 +16,15 @@ from datetime import datetime
 # ===============================
 # Configuration
 # ===============================
-MODEL_NAME = "arcface"
+MODEL_NAME = "scrfd"
 HTTP_URL = "triton:8000"
 GRPC_URL = "triton:8001"
 WARMUP_REQUESTS = 10
-REQUEST_COUNT = 5000
+REQUEST_COUNT = 100
 MAX_THREADS = 4
-SHAPE = "input.1:1,112,112,3"
+SHAPE = "input.1:3,640,640"
 NUM_ITERATIONS = 20
-CSV_FILE = "arcface_perf_results.csv"
+CSV_FILE = "scrfd_perf_results.csv"
 
 
 # ===============================
